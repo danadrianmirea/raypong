@@ -11,7 +11,7 @@ void Paddle::Init()
     height = 120;
     x = GetScreenWidth() - width - 10;
     y = GetScreenHeight() / 2 - height / 2;
-    speed = 600;
+    speed = 900;
     color = BLUE;
 }
 

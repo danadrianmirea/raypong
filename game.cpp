@@ -4,6 +4,7 @@ Game::Game()
 {
     firstRun = true;
     InitAudioDevice();
+    SetMasterVolume(0.5f);
     sndBallBounce = LoadSound("res/ball_bounce.mp3");         // Load WAV audio file
     ResetGame();
 }
