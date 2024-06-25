@@ -35,10 +35,9 @@ public:
         return instance;
     }
 
-    
-
     void Update(float dt);
     void Draw();
+    void DrawUI();
     void ResetObjects();
     void ResetGame();    
     void NextLevel();
@@ -57,6 +56,8 @@ public:
     int player_score;
     int oponent_score;
     bool firstRun;
+    bool playerScored;
+    bool oponentScored;
     bool gameover;
     bool playerWins;
     bool levelComplete;

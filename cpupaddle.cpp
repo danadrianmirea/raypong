@@ -23,8 +23,8 @@ void CPUPaddle::Update(float dt, float ball_y)
     thinkDelayTime += dt;
     Game* game = Game::GetInstance();
     float totalThinkDelay = cpuPaddleThinkTimes[game->level-1] + cpuThinkTimeDecay* game->GetNumBallBounces();
+    //DrawText(TextFormat("%.2f", totalThinkDelay), screenWidth / 2 - 450, screenHeight / 2 + 50, 50, WHITE);
 
-    DrawText(TextFormat("%.2f", totalThinkDelay), screenWidth / 2 - 450, screenHeight / 2 + 50, 50, WHITE);
     if(thinkDelayTime < totalThinkDelay )
     {
         return;
