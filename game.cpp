@@ -2,15 +2,11 @@
 
 Game::Game()
 {
-    // firstRun = true;
     firstTimeGameStart = true;
-
-    sndBallBounce = LoadSound("res/ball_bounce.mp3"); // Load WAV audio file
-
+    sndBallBounce = LoadSound("res/ball_bounce.mp3"); 
     targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
-    SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR); // Texture scale filter to use
+    SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR); 
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
-
     InitGame();
 }
 
@@ -19,7 +15,6 @@ Game::~Game()
     UnloadRenderTexture(targetRenderTex);
     UnloadFont(font);
     UnloadSound(sndBallBounce);
-
     delete instance;
     instance = 0;
 }
@@ -132,14 +127,12 @@ void Game::Update(float dt)
         {
             oponent_score++;
             oponentScored = true;
-            // ResetObjects();
         }
 
         if (ball.x < ball.cRadius)
         {
             player_score++;
             playerScored = true;
-            // ResetObjects();
         }
 
         if (oponent_score >= 5)
@@ -275,37 +268,6 @@ void Game::DrawUI()
     DrawText(TextFormat("%i", player_score), 3 * gameScreenWidth / 4 - 20, 80, 80, player.color);
 
     DrawText(TextFormat("Level: %i", level), gameScreenWidth / 2 - 140, 80, 80, WHITE);
-
-    /*
-    if (firstRun)
-    {
-        DrawText("Press space to play", gameScreenWidth / 2 - 250, gameScreenHeight / 2 + 50, 50, WHITE);
-    }
-    else if (gameover)
-    {
-        if (playerWins)
-        {
-            DrawText("You win! Press space to play again", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
-        }
-        else
-        {
-            DrawText("Game Over! Press space to play again", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
-        }
-    }
-    else if (playerScored && !levelComplete)
-    {
-        DrawText("Blue scores! Press space", gameScreenWidth / 2 - 300, gameScreenHeight / 2 + 50, 50, WHITE);
-    }
-    else if (oponentScored && !levelComplete)
-    {
-        DrawText("Red scores! Press space", gameScreenWidth / 2 - 300, gameScreenHeight / 2 + 50, 50, WHITE);
-    }
-
-    else if (levelComplete)
-    {
-        DrawText("You win! Press space for next level", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
-    }
-    */
 }
 
 void Game::DrawScreenSpaceUI()
