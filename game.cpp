@@ -3,9 +3,9 @@
 Game::Game()
 {
     firstTimeGameStart = true;
-    sndBallBounce = LoadSound("res/ball_bounce.mp3"); 
+    sndBallBounce = LoadSound("res/ball_bounce.mp3");
     targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
-    SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR); 
+    SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
     InitGame();
 }
@@ -172,6 +172,23 @@ void Game::UpdateUI()
         isInExitMenu = true;
         return;
     }
+
+#ifdef AM_RAY_DEBUG
+    if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+    {
+        if (fullscreen)
+        {
+            fullscreen = false;
+            ToggleBorderlessWindowed();
+            SetWindowPosition(minimizeOffset, minimizeOffset);
+        }
+        else
+        {
+            fullscreen = true;
+            ToggleBorderlessWindowed();
+        }
+    }
+#endif
 
     if (IsKeyPressed(KEY_SPACE))
     {
