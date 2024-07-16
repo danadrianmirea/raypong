@@ -19,9 +19,9 @@ int main()
     while (WindowShouldClose() == false)
     {
         game->Update(dt);
-        BeginDrawing();
+        
         game->Draw();
-        EndDrawing();
+        
         dt = GetFrameTime();
     }
 

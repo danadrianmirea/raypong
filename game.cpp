@@ -165,6 +165,8 @@ void Game::Update(float dt)
 
 void Game::Draw()
 {
+    BeginDrawing();
+
     ClearBackground(boardColor);
 
     Color centerLineColor = markingColor;
@@ -182,6 +184,8 @@ void Game::Draw()
     oponent.Draw();
 
     DrawUI();
+
+    EndDrawing();
 }
 
 void Game::DrawUI()
