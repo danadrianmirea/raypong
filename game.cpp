@@ -146,7 +146,7 @@ void Game::Update(float dt)
         {
             gameOver = true;
         }
-        else if (player_score >= 1)
+        else if (player_score >= 5)
         {
             if (level >= maxLevels)
             {
@@ -333,12 +333,14 @@ void Game::DrawScreenSpaceUI()
     else if (gameOver)
     {
         DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+
         if (playerWins)
         {
             DrawText("You win! Press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
         }
         else
         {
+
             DrawText("Game over, press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
         }
     }
