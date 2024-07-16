@@ -13,7 +13,7 @@ void CPUPaddle::Init()
     x = 10;
     //speed = cpuPaddleSpeeds[0];
     speed = 800;
-    y = GetScreenHeight() / 2 - height / 2;
+    y = gameScreenHeight / 2 - height / 2;
     color = Color{255, 41, 55, 255};
     thinkDelayTime = 0.0f;
 }
@@ -51,5 +51,5 @@ void CPUPaddle::SetSpeed(int spd)
 void CPUPaddle::ResetPosition()
 {
     x = 10;
-    y = GetScreenHeight() / 2 - height / 2;
+    y = gameScreenHeight / 2 - height / 2;
 }

@@ -1,3 +1,4 @@
+#include "globals.h"
 #include "paddle.h"
 
 Paddle::Paddle()
@@ -9,8 +10,8 @@ void Paddle::Init()
 {
     width = 25;
     height = 120;
-    x = GetScreenWidth() - width - 10;
-    y = GetScreenHeight() / 2 - height / 2;
+    x = gameScreenWidth - width - 10;
+    y = gameScreenHeight / 2 - height / 2;
     speed = 900;
     color = BLUE;
 }
@@ -37,8 +38,8 @@ void Paddle::Update(float dt)
 
 void Paddle::ResetPosition()
 {
-    x = GetScreenWidth() - width - 10;
-    y = GetScreenHeight() / 2 - height / 2;
+    x = gameScreenWidth - width - 10;
+    y = gameScreenHeight / 2 - height / 2;
 }
 
 void Paddle::LimitPaddleBounds()
@@ -48,8 +49,8 @@ void Paddle::LimitPaddleBounds()
         y = 0;
     }
 
-    if (y > GetScreenHeight() - height)
+    if (y > gameScreenHeight - height)
     {
-        y = GetScreenHeight() - height;
+        y = gameScreenHeight - height;
     }
 }

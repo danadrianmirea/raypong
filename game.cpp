@@ -2,24 +2,40 @@
 
 Game::Game()
 {
-    firstRun = true;
-    InitAudioDevice();
-    SetMasterVolume(0.5f);
+    // firstRun = true;
+    firstTimeGameStart = true;
+
     sndBallBounce = LoadSound("res/ball_bounce.mp3"); // Load WAV audio file
-    ResetGame();
+
+    targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
+    SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR); // Texture scale filter to use
+    font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
+
+    InitGame();
 }
 
 Game::~Game()
 {
+    UnloadRenderTexture(targetRenderTex);
+    UnloadFont(font);
+    UnloadSound(sndBallBounce);
+
     delete instance;
     instance = 0;
-    UnloadSound(sndBallBounce);
 }
 
-void Game::ResetGame()
+void Game::InitGame()
 {
+    isFirstFrameAfterReset = true;
+    isInExitMenu = false;
+    paused = false;
+    lostWindowFocus = false;
+    gameOver = false;
+
+    screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
+
     level = 1;
-    gameover = false;
+
     playerScored = false;
     oponentScored = false;
     playerWins = false;
@@ -34,6 +50,11 @@ void Game::ResetGame()
     oponent.Init();
 
     ball.SetSpeed(ballSpeeds[level - 1], ballSpeeds[level - 1]);
+}
+
+void Game::Reset()
+{
+    InitGame();
 }
 
 void Game::NextLevel()
@@ -62,36 +83,14 @@ void Game::Update(float dt)
         return;
     }
 
-    if (gameover || firstRun)
+    screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
+    UpdateUI();
+
+    bool running = (firstTimeGameStart == false && paused == false && lostWindowFocus == false && isInExitMenu == false && gameOver == false & oponentScored == false && playerScored == false && levelComplete == false);
+    if (running)
     {
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            if (firstRun)
-            {
-                firstRun = false;
-            }
-            ResetGame();
-            return;
-        }
-    }
-    else if (levelComplete)
-    {
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            NextLevel();
-            return;
-        }
-    }
-    else if (playerScored || oponentScored)
-    {
-        if (IsKeyPressed(KEY_SPACE))
-        {
-            playerScored = false;
-            oponentScored = false;
-        }
-    }
-    else
-    {
+        HandleInput();
+
         ball.Update(dt);
         player.Update(dt);
         oponent.Update(dt, ball.y);
@@ -129,30 +128,30 @@ void Game::Update(float dt)
             PlaySound(sndBallBounce);
         }
 
-        if (ball.x >= GetScreenWidth() - ball.cRadius)
+        if (ball.x >= gameScreenWidth - ball.cRadius)
         {
             oponent_score++;
             oponentScored = true;
-            ResetObjects();
+            // ResetObjects();
         }
 
         if (ball.x < ball.cRadius)
         {
             player_score++;
             playerScored = true;
-            ResetObjects();
+            // ResetObjects();
         }
 
-        if (oponent_score >= 3)
+        if (oponent_score >= 5)
         {
-            gameover = true;
+            gameOver = true;
         }
-        else if (player_score >= 3)
+        else if (player_score >= 1)
         {
             if (level >= maxLevels)
             {
                 level = maxLevels;
-                gameover = true;
+                gameOver = true;
                 playerWins = true;
             }
             else
@@ -163,66 +162,209 @@ void Game::Update(float dt)
     }
 }
 
+void Game::HandleInput()
+{
+    if (isFirstFrameAfterReset)
+    {
+        isFirstFrameAfterReset = false;
+        return;
+    }
+}
+
+void Game::UpdateUI()
+{
+    if (WindowShouldClose() || (IsKeyPressed(KEY_ESCAPE) && exitWindowRequested == false))
+    {
+        exitWindowRequested = true;
+        isInExitMenu = true;
+        return;
+    }
+
+    if (IsKeyPressed(KEY_SPACE))
+    {
+        if (firstTimeGameStart && IsKeyPressed(KEY_SPACE))
+        {
+            firstTimeGameStart = false;
+        }
+        else if (gameOver && IsKeyPressed(KEY_SPACE))
+        {
+            Reset();
+        }
+        else if (levelComplete)
+        {
+            NextLevel();
+        }
+        else if (playerScored || oponentScored)
+        {
+            playerScored = false;
+            oponentScored = false;
+            ResetObjects();
+        }
+        return;
+    }
+
+    if (exitWindowRequested)
+    {
+        if (IsKeyPressed(KEY_Y))
+        {
+            exitWindow = true;
+        }
+        else if (IsKeyPressed(KEY_N) || IsKeyPressed(KEY_ESCAPE))
+        {
+            exitWindowRequested = false;
+            isInExitMenu = false;
+        }
+    }
+
+    if (IsWindowFocused() == false)
+    {
+        lostWindowFocus = true;
+    }
+    else
+    {
+        lostWindowFocus = false;
+    }
+
+    if (exitWindowRequested == false && lostWindowFocus == false && gameOver == false && isFirstFrameAfterReset == false && IsKeyPressed(KEY_P))
+    {
+        if (paused)
+        {
+            paused = false;
+        }
+        else
+        {
+            paused = true;
+        }
+    }
+}
+
 void Game::Draw()
 {
-    BeginDrawing();
-
+    // render everything to a texture
+    BeginTextureMode(targetRenderTex);
     ClearBackground(boardColor);
 
     Color centerLineColor = markingColor;
     centerLineColor.a = 90;
-
-    DrawLine(screenWidth / 2, 0, screenWidth / 2, screenHeight, centerLineColor);
+    DrawLine(gameScreenWidth / 2, 0, gameScreenWidth / 2, gameScreenHeight, centerLineColor);
     // DrawLine(0, screenHeight/2, screenWidth, screenHeight/2, markingColor);
-
     Color centerColor = markingColor;
     centerColor.a = 100;
-    DrawCircle(screenWidth / 2, screenHeight / 2, 100, centerColor);
-
+    DrawCircle(gameScreenWidth / 2, gameScreenHeight / 2, 100, centerColor);
     ball.Draw();
     player.Draw();
     oponent.Draw();
-
     DrawUI();
 
+    EndTextureMode();
+
+    // render the scaled frame texture to the screen
+    BeginDrawing();
+    ClearBackground(BLACK);
+    DrawTexturePro(targetRenderTex.texture, (Rectangle){0.0f, 0.0f, (float)targetRenderTex.texture.width, (float)-targetRenderTex.texture.height},
+                   (Rectangle){(GetScreenWidth() - ((float)gameScreenWidth * screenScale)) * 0.5f, (GetScreenHeight() - ((float)gameScreenHeight * screenScale)) * 0.5f, (float)gameScreenWidth * screenScale, (float)gameScreenHeight * screenScale},
+                   (Vector2){0, 0}, 0.0f, WHITE);
+
+    DrawScreenSpaceUI();
     EndDrawing();
 }
 
 void Game::DrawUI()
 {
-    DrawText(TextFormat("%i", oponent_score), screenWidth / 4 - 20, 80, 80, oponent.color);
-    DrawText(TextFormat("%i", player_score), 3 * screenWidth / 4 - 20, 80, 80, player.color);
+    DrawText(TextFormat("%i", oponent_score), gameScreenWidth / 4 - 20, 80, 80, oponent.color);
+    DrawText(TextFormat("%i", player_score), 3 * gameScreenWidth / 4 - 20, 80, 80, player.color);
 
-    DrawText(TextFormat("Level: %i", level), screenWidth / 2 - 140, 80, 80, WHITE);
+    DrawText(TextFormat("Level: %i", level), gameScreenWidth / 2 - 140, 80, 80, WHITE);
 
+    /*
     if (firstRun)
     {
-        DrawText("Press space to play", screenWidth / 2 - 250, screenHeight / 2 + 50, 50, WHITE);
+        DrawText("Press space to play", gameScreenWidth / 2 - 250, gameScreenHeight / 2 + 50, 50, WHITE);
     }
     else if (gameover)
     {
         if (playerWins)
         {
-            DrawText("You win! Press space to play again", screenWidth / 2 - 450, screenHeight / 2 + 50, 50, WHITE);
+            DrawText("You win! Press space to play again", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
         }
         else
         {
-            DrawText("Game Over! Press space to play again", screenWidth / 2 - 450, screenHeight / 2 + 50, 50, WHITE);
+            DrawText("Game Over! Press space to play again", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
         }
     }
     else if (playerScored && !levelComplete)
     {
-        DrawText("Blue scores! Press space", screenWidth / 2 - 300, screenHeight / 2 + 50, 50, WHITE);
+        DrawText("Blue scores! Press space", gameScreenWidth / 2 - 300, gameScreenHeight / 2 + 50, 50, WHITE);
     }
     else if (oponentScored && !levelComplete)
     {
-        DrawText("Red scores! Press space", screenWidth / 2 - 300, screenHeight / 2 + 50, 50, WHITE);
+        DrawText("Red scores! Press space", gameScreenWidth / 2 - 300, gameScreenHeight / 2 + 50, 50, WHITE);
     }
 
     else if (levelComplete)
     {
-        DrawText("You win! Press space for next level", screenWidth / 2 - 450, screenHeight / 2 + 50, 50, WHITE);
+        DrawText("You win! Press space for next level", gameScreenWidth / 2 - 450, gameScreenHeight / 2 + 50, 50, WHITE);
     }
+    */
+}
+
+void Game::DrawScreenSpaceUI()
+{
+    if (exitWindowRequested)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Are you sure you want to exit? [Y/N]", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (firstTimeGameStart)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Press SPACE to play", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (paused)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Game paused, press P to continue", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (lostWindowFocus)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Game paused, focus window to continue", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (gameOver)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        if (playerWins)
+        {
+            DrawText("You win! Press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        }
+        else
+        {
+            DrawText("Game over, press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        }
+    }
+    else if (levelComplete)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Level complete! Press SPACE for next level", GetScreenWidth() / 2 - 450, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (oponentScored)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Oponent scores! Press SPACE", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+    }
+    else if (playerScored)
+    {
+        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Player scores! Press SPACE", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+    }
+}
+
+std::string Game::FormatWithLeadingZeroes(int number, int width)
+{
+    std::string numberText = std::to_string(number);
+    int leadingZeros = width - numberText.length();
+    numberText = std::string(leadingZeros, '0') + numberText;
+    return numberText;
 }
 
 void Game::ResetObjects()

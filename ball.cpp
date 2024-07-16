@@ -9,8 +9,8 @@ Ball::Ball()
 void Ball::Init()
 {
     radius = cRadius;
-    x = GetScreenWidth() / 2;
-    y = GetScreenHeight() / 2;
+    x = gameScreenWidth / 2;
+    y = gameScreenHeight / 2;
     speed_x = ballSpeeds[0];
     speed_y = ballSpeeds[0];
     color = ballColor;
@@ -26,13 +26,13 @@ void Ball::Update(float dt)
     x += speed_x * dt;
     y += speed_y * dt;
 
-    if ((y >= GetScreenHeight() - cRadius) || (y <= cRadius))
+    if ((y >= gameScreenHeight - cRadius) || (y <= cRadius))
     {
         speed_y *= -1;
     }
 
     /*
-    if ((x >= GetScreenWidth() - cRadius) || (x <= cRadius))
+    if ((x >= gameScreenWidth - cRadius) || (x <= cRadius))
     {
         speed_x *= -1;
     }
@@ -41,8 +41,8 @@ void Ball::Update(float dt)
 
 void Ball::ResetBall()
 {
-    x = GetScreenWidth() / 2;
-    y = GetScreenHeight() / 2;
+    x = gameScreenWidth / 2;
+    y = gameScreenHeight / 2;
 
     int speeds[] = {-1, 1};
     speed_x *= speeds[GetRandomValue(0, 1)];

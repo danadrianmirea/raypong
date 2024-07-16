@@ -1,28 +1,33 @@
 #include <iostream>
 #include <raylib.h>
+#include "globals.h"
 #include <game.h>
 
 using namespace std;
 
-Game* Game::instance = NULL; 
+Game *Game::instance = NULL;
 
 int main()
 {
-    InitWindow(screenWidth, screenHeight, "Pong");
+    InitWindow(gameScreenWidth, gameScreenHeight, "Pong");
+    InitAudioDevice();
+    SetMasterVolume(0.22f);
+    SetExitKey(KEY_NULL);
+
+    Game *game = Game::GetInstance();
+    ToggleBorderlessWindowed();
     SetTargetFPS(144);
 
-    Game* game = Game::GetInstance();
-    game->ResetGame();
+    float dt = 0.0f;
 
-    float dt = GetFrameTime();
-
-    while (WindowShouldClose() == false)
+    while (!exitWindow)
     {
-        game->Update(dt);
-        game->Draw();       
         dt = GetFrameTime();
+        game->Update(dt);
+        game->Draw();
     }
 
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
