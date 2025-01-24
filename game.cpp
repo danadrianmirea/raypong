@@ -81,7 +81,7 @@ void Game::Update(float dt)
     screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
     UpdateUI();
 
-    bool running = (firstTimeGameStart == false && paused == false && lostWindowFocus == false && isInExitMenu == false && gameOver == false & oponentScored == false && playerScored == false && levelComplete == false);
+    bool running = (firstTimeGameStart == false && paused == false && lostWindowFocus == false && isInExitMenu == false && gameOver == false && oponentScored == false && playerScored == false && levelComplete == false);
     if (running)
     {
         HandleInput();
