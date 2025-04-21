@@ -192,13 +192,13 @@ void Game::UpdateUI()
     }
 #endif
 
-    if (IsKeyPressed(KEY_SPACE))
+    if (IsKeyPressed(KEY_ENTER))
     {
-        if (firstTimeGameStart && IsKeyPressed(KEY_SPACE))
+        if (firstTimeGameStart && IsKeyPressed(KEY_ENTER))
         {
             firstTimeGameStart = false;
         }
-        else if (gameOver && IsKeyPressed(KEY_SPACE))
+        else if (gameOver && IsKeyPressed(KEY_ENTER))
         {
             Reset();
         }
@@ -303,7 +303,7 @@ void Game::DrawScreenSpaceUI()
     else if (firstTimeGameStart)
     {
         DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Press SPACE to play", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Press ENTER to play", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2, 40, yellow);
     }
     else if (paused)
     {
@@ -325,28 +325,28 @@ void Game::DrawScreenSpaceUI()
 
         if (playerWins)
         {
-            DrawText("You win! Press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+            DrawText("You win! Press ENTER to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
         }
         else
         {
 
-            DrawText("Game over, press SPACE to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+            DrawText("Game over, press ENTER to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
         }
     }
     else if (levelComplete)
     {
         DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Level complete! Press SPACE for next level", GetScreenWidth() / 2 - 450, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Level complete! Press ENTER for next level", GetScreenWidth() / 2 - 450, GetScreenHeight() / 2, 40, yellow);
     }
     else if (oponentScored)
     {
         DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Oponent scores! Press SPACE", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Oponent scores! Press ENTER", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
     }
     else if (playerScored)
     {
         DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Player scores! Press SPACE", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Player scores! Press ENTER", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
     }
 }
 
