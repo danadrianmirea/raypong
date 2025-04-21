@@ -1,7 +1,7 @@
 #include <iostream>
 #include <raylib.h>
 #include "globals.h"
-#include <game.h>
+#include "game.h"
 
 using namespace std;
 

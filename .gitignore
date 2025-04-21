@@ -3,3 +3,10 @@ web-build/
 *.zip
 *.exe
 *.dsym
+*.idx
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.def
+*.manifest
