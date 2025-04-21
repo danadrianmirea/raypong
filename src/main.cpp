@@ -3,9 +3,23 @@
 #include "globals.h"
 #include "game.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 using namespace std;
 
 Game *Game::instance = NULL;
+
+// Global game instance
+Game *game = nullptr;
+
+// Game loop function
+void gameLoop() {
+    float dt = GetFrameTime();
+    game->Update(dt);
+    game->Draw();
+}
 
 int main()
 {
@@ -14,20 +28,23 @@ int main()
     SetMasterVolume(0.22f);
     SetExitKey(KEY_NULL);
 
-    Game *game = Game::GetInstance();
+    game = Game::GetInstance();
     ToggleBorderlessWindowed();
     SetTargetFPS(144);
 
-    float dt = 0.0f;
-
+#ifdef __EMSCRIPTEN__
+    // Set up the game loop for Emscripten
+    emscripten_set_main_loop(gameLoop, 0, 1);
+#else
+    // Regular desktop game loop
     while (!exitWindow)
     {
-        dt = GetFrameTime();
-        game->Update(dt);
-        game->Draw();
+        gameLoop();
     }
 
     CloseAudioDevice();
     CloseWindow();
+#endif
+
     return 0;
 }
