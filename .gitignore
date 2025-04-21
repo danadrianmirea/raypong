@@ -1,3 +1,5 @@
+build/
+web-build/
+*.zip
 *.exe
 *.dsym
-main
