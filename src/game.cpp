@@ -271,6 +271,7 @@ void Game::Draw()
     player.Draw();
     oponent.Draw();
     DrawUI();
+    DrawUI();
 
     EndTextureMode();
 
@@ -281,7 +282,7 @@ void Game::Draw()
                    (Rectangle){(GetScreenWidth() - ((float)gameScreenWidth * screenScale)) * 0.5f, (GetScreenHeight() - ((float)gameScreenHeight * screenScale)) * 0.5f, (float)gameScreenWidth * screenScale, (float)gameScreenHeight * screenScale},
                    (Vector2){0, 0}, 0.0f, WHITE);
 
-    DrawScreenSpaceUI();
+    
     EndDrawing();
 }
 
@@ -291,62 +292,58 @@ void Game::DrawUI()
     DrawText(TextFormat("%i", player_score), 3 * gameScreenWidth / 4 - 20, 80, 80, player.color);
 
     DrawText(TextFormat("Level: %i", level), gameScreenWidth / 2 - 140, 80, 80, WHITE);
-}
 
-void Game::DrawScreenSpaceUI()
-{
     if (exitWindowRequested)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Are you sure you want to exit? [Y/N]", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Are you sure you want to exit? [Y/N]", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
     }
     else if (firstTimeGameStart)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Press ENTER to play", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Press ENTER to play", gameScreenWidth / 2 - 200, gameScreenHeight / 2, 40, yellow);
     }
     else if (paused)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
 #ifndef EMSCRIPTEN_BUILD    
-        DrawText("Game paused, press P to continue", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Game paused, press P to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
 #else
-        DrawText("Game paused, press P or ESC to continue", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        DrawText("Game paused, press P or ESC to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
 #endif
     }
     else if (lostWindowFocus)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Game paused, focus window to continue", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Game paused, focus window to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
     }
     else if (gameOver)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
 
         if (playerWins)
         {
-            DrawText("You win! Press ENTER to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+            DrawText("You win! Press ENTER to play again", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
         }
         else
         {
-
-            DrawText("Game over, press ENTER to play again", GetScreenWidth() / 2 - 400, GetScreenHeight() / 2, 40, yellow);
+            DrawText("Game over, press ENTER to play again", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
         }
     }
     else if (levelComplete)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Level complete! Press ENTER for next level", GetScreenWidth() / 2 - 450, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Level complete! Press ENTER for next level", gameScreenWidth / 2 - 450, gameScreenHeight / 2, 40, yellow);
     }
     else if (oponentScored)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Oponent scores! Press ENTER", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Oponent scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
     }
     else if (playerScored)
     {
-        DrawRectangleRounded({(float)(GetScreenWidth() / 2 - 500), (float)(GetScreenHeight() / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Player scores! Press ENTER", GetScreenWidth() / 2 - 300, GetScreenHeight() / 2, 40, yellow);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
+        DrawText("Player scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
     }
 }
 
