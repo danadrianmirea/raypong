@@ -166,6 +166,12 @@
                 })(),
                 canvas: (function() {
                     var canvas = document.getElementById('canvas');
+                    
+                    // Force resize after 300ms to fix Emscripten web build issues
+                    setTimeout(function() {
+                        window.dispatchEvent(new Event('resize'));
+                    }, 300);
+                    
                     return canvas;
                 })()
             };
