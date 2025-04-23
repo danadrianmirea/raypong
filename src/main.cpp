@@ -27,9 +27,7 @@ int main()
     InitAudioDevice();
     SetMasterVolume(0.22f);
     SetExitKey(KEY_NULL);
-
     game = Game::GetInstance();
-    ToggleBorderlessWindowed();
     SetTargetFPS(144);
 
 #ifdef __EMSCRIPTEN__
@@ -37,6 +35,7 @@ int main()
     emscripten_set_main_loop(gameLoop, 0, 1);
 #else
     // Regular desktop game loop
+    ToggleBorderlessWindowed();
     while (!exitWindow)
     {
         gameLoop();

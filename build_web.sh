@@ -15,12 +15,14 @@ emcc src/*.cpp -o web-build/index.html \
   -s STACK_SIZE=2097152 \
   --preload-file Font@/Font \
   --preload-file res@/res \
-  --shell-file minshell.html
+  --shell-file custom_shell.html
 
 # Check if the emcc build was successful
 if [ $? -eq 0 ]; then
   echo "Build succeeded, creating web-build.zip..."
   powershell -Command "Compress-Archive -Path web-build\* -DestinationPath web-build.zip -Force"
+  echo "Starting web server..."
+  python -m http.server 8000 --directory web-build
 else
   echo "Build failed, not creating zip."
 fi
