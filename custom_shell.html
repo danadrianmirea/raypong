@@ -73,9 +73,9 @@
 		
 		// Force landscape dimensions
 		if (screenHeight > screenWidth) {
-		  // Portrait mode - use width as base and calculate height to maintain 16:9
+		  // Portrait mode - use width for both width and height
 		  canvas.width = screenWidth;
-		  canvas.height = screenWidth * (9/16);
+		  canvas.height = screenWidth;
 		} else {
 		  // Landscape mode - use standard dimensions
 		  canvas.width = screenWidth;
