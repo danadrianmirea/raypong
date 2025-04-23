@@ -24,13 +24,15 @@ A modern implementation of the classic Pong game built with [raylib](https://www
 
 - C++ compiler (GCC/MinGW recommended)
 - raylib library
-- Make
+- CMake (version 3.10 or higher)
 
 ### Build Instructions
 
 1. Clone the repository
-2. Run `make` to build the project
-3. The executable will be generated as `game.exe`
+2. Create a build directory: `mkdir build && cd build`
+3. Generate build files: `cmake ..`
+4. Build the project: `cmake --build .`
+5. The executable will be generated as `game.exe` in the build directory
 
 ## Project Structure
 
