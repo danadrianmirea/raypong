@@ -15,7 +15,6 @@ A modern implementation of the classic Pong game built with [raylib](https://www
 
 - **W/S** or **Up/Down Arrow Keys**: Move paddle up/down
 - **P**: Pause game
-- **R**: Reset game
 - **ESC**: Exit game
 
 ## Building

@@ -17,9 +17,6 @@ Game::Game()
     SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
 
-    // Initialize screen scale first
-    screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
-
     // Initialize mobile controls
     if (isMobile) {
         upButton = { 0.0f + buttonSpacingX, (float)(gameScreenHeight - buttonSize - buttonSpacingY), (float)buttonSize, (float)buttonSize };
@@ -271,7 +268,6 @@ void Game::UpdateUI()
             // Flag that we should toggle pause
             shouldTogglePause = true;
         }
-        return;
     }
 
     // Handle keyboard input for non-mobile
@@ -420,8 +416,14 @@ void Game::DrawUI()
             DrawText("Welcome to Pong!", gameScreenWidth / 2 - 200, gameScreenHeight / 2 - 150, 50, yellow);
             DrawText("Controls:", gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 80, 40, WHITE);
             DrawText("W/S or Up/Down Arrow Keys: Move paddle", gameScreenWidth / 2 - 400, gameScreenHeight / 2 - 20, 30, WHITE);
+#ifndef EMSCRIPTEN_BUILD
             DrawText("P: Pause game", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 20, 30, WHITE);
+#else
+            DrawText("P or ESC: Pause game", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 20, 30, WHITE);
+#endif
+#ifndef EMSCRIPTEN_BUILD
             DrawText("ESC: Exit game", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 60, 30, WHITE);
+#endif
             DrawText("Press ENTER to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 100, 40, yellow);
         }
     }
