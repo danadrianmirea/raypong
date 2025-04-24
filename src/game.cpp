@@ -1,6 +1,14 @@
 #include "game.h"
 #include <math.h>
 
+// Helper function to clamp a value between min and max
+static float Clamp(float value, float min, float max)
+{
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
 Game::Game()
 {
     firstTimeGameStart = true;
@@ -106,10 +114,16 @@ void Game::Update(float dt)
         // Check collisions
         if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height}))
         {
-            ball.speed_x *= -1;
+            // Calculate the normal vector for the paddle collision
+            // For the player paddle (left side), the normal points right
+            Vector2 normal = {1.0f, 0.0f};
+            ball.Reflect(normal);
+            
             numBounces++;
             ball.AddBounceSpeed(ballSpeedBounceIncrement);
-            if (ball.speed_y < 0)
+            
+            // Adjust position to prevent sticking
+            if (ball.velocity.y < 0)
             {
                 ball.SetPosition(ball.x - (int)(ball.radius * bounceBack), ball.y - (int)(ball.radius * bounceBack));
             }
@@ -122,10 +136,16 @@ void Game::Update(float dt)
 
         if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{oponent.x, oponent.y, oponent.width, oponent.height}))
         {
-            ball.speed_x *= -1;
+            // Calculate the normal vector for the paddle collision
+            // For the opponent paddle (right side), the normal points left
+            Vector2 normal = {-1.0f, 0.0f};
+            ball.Reflect(normal);
+            
             numBounces++;
             ball.AddBounceSpeed(ballSpeedBounceIncrement);
-            if (ball.speed_y < 0)
+            
+            // Adjust position to prevent sticking
+            if (ball.velocity.y < 0)
             {
                 ball.SetPosition(ball.x + (int)(ball.radius * bounceBack), ball.y - (int)(ball.radius * bounceBack));
             }
