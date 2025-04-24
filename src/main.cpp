@@ -10,6 +10,7 @@
 using namespace std;
 
 Game *Game::instance = NULL;
+bool Game::isMobile = false;
 
 // Global game instance
 Game *game = nullptr;
@@ -31,6 +32,11 @@ int main()
     SetTargetFPS(144);
 
 #ifdef __EMSCRIPTEN__
+    // Detect if running on mobile device
+    Game::isMobile = EM_ASM_INT({
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    });
+    
     // Set up the game loop for Emscripten
     emscripten_set_main_loop(gameLoop, 0, 1);
 #else

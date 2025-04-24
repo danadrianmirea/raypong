@@ -57,6 +57,7 @@ public:
     bool paused;
     bool lostWindowFocus;
     bool gameOver;
+    static bool isMobile;
 
 private:
     Game();                                 // private constructor
