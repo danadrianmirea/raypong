@@ -87,5 +87,13 @@ private:
 
     float screenScale;
     RenderTexture2D targetRenderTex;
-    Font font;    
+    Font font;
+
+    // Mobile controls
+    Rectangle upButton;
+    Rectangle downButton;
+    const int buttonSize = 80;
+    const int buttonSpacing = 20;
+    bool upButtonPressed;
+    bool downButtonPressed;
 };

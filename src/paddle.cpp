@@ -23,16 +23,6 @@ void Paddle::Draw()
 
 void Paddle::Update(float dt)
 {
-    if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP))
-    {
-        y = y - speed * dt;
-    }
-
-    if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN))
-    {
-        y = y + speed * dt;
-    }
-
     LimitPaddleBounds();
 }
 
