@@ -92,8 +92,12 @@ private:
     // Mobile controls
     Rectangle upButton;
     Rectangle downButton;
-    const int buttonSize = 80;
-    const int buttonSpacing = 20;
+    float collisionScale = 3.0f;
+    Rectangle upButtonExpanded;
+    Rectangle downButtonExpanded;
+    int buttonSize = 120;
+    int buttonSpacingX = 260;
+    int buttonSpacingY = 80;
     bool upButtonPressed;
     bool downButtonPressed;
 };

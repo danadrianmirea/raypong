@@ -9,16 +9,15 @@ Game::Game()
     SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
 
+    // Initialize screen scale first
+    screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
+
     // Initialize mobile controls
     if (isMobile) {
-        // Position buttons at bottom center
-        int totalHeight = 2 * buttonSize + buttonSpacing;
-        int startY = gameScreenHeight - totalHeight - buttonSpacing;
-        int centerX = gameScreenWidth / 2 - buttonSize / 2;
-        
-        upButton = { (float)centerX, (float)startY, (float)buttonSize, (float)buttonSize };
-        downButton = { (float)centerX, (float)(startY + buttonSize + buttonSpacing), (float)buttonSize, (float)buttonSize };
-        
+        upButton = { 0.0f + buttonSpacingX, (float)(gameScreenHeight - buttonSize - buttonSpacingY), (float)buttonSize, (float)buttonSize };
+        downButton = { (float)gameScreenWidth - buttonSize - buttonSpacingX, (float)(gameScreenHeight - buttonSize - buttonSpacingY), (float)buttonSize, (float)buttonSize };
+        upButtonExpanded = { upButton.x - upButton.width * collisionScale, upButton.y - upButton.height * collisionScale, upButton.width * (1.0f + 2.0f * collisionScale), upButton.height * (1.0f + 2.0f * collisionScale) };
+        downButtonExpanded = { downButton.x - downButton.width * collisionScale, downButton.y - downButton.height * collisionScale, downButton.width * (1.0f + 2.0f * collisionScale), downButton.height * (1.0f + 2.0f * collisionScale) };
         upButtonPressed = false;
         downButtonPressed = false;
     }
@@ -42,8 +41,6 @@ void Game::InitGame()
     paused = false;
     lostWindowFocus = false;
     gameOver = false;
-
-    screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
 
     level = 1;
 
@@ -181,36 +178,18 @@ void Game::HandleInput()
 
     if (isMobile) {
         // Handle mobile touch input
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
             Vector2 touchPos = GetMousePosition();
             
             // Adjust touch position for screen scaling
             touchPos.x = (touchPos.x - (GetScreenWidth() - gameScreenWidth * screenScale) * 0.5f) / screenScale;
             touchPos.y = (touchPos.y - (GetScreenHeight() - gameScreenHeight * screenScale) * 0.5f) / screenScale;
-            
-            // Check if touch is outside the buttons (for pause)
-            if (!CheckCollisionPointRec(touchPos, upButton) && !CheckCollisionPointRec(touchPos, downButton)) {
-                paused = !paused;
-            }
-            
-            upButtonPressed = CheckCollisionPointRec(touchPos, upButton);
-            downButtonPressed = CheckCollisionPointRec(touchPos, downButton);
-            
-            if (upButtonPressed) {
-                player.y -= player.speed * GetFrameTime();
-            }
-            if (downButtonPressed) {
-                player.y += player.speed * GetFrameTime();
-            }
-        } else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-            Vector2 touchPos = GetMousePosition();
-            
-            // Adjust touch position for screen scaling
-            touchPos.x = (touchPos.x - (GetScreenWidth() - gameScreenWidth * screenScale) * 0.5f) / screenScale;
-            touchPos.y = (touchPos.y - (GetScreenHeight() - gameScreenHeight * screenScale) * 0.5f) / screenScale;
-            
-            upButtonPressed = CheckCollisionPointRec(touchPos, upButton);
-            downButtonPressed = CheckCollisionPointRec(touchPos, downButton);
+
+            upButtonExpanded = { upButton.x - upButton.width * collisionScale, upButton.y - upButton.height * collisionScale, upButton.width * (1.0f + 2.0f * collisionScale), upButton.height * (1.0f + 2.0f * collisionScale) };
+            downButtonExpanded = { downButton.x - downButton.width * collisionScale, downButton.y - downButton.height * collisionScale, downButton.width * (1.0f + 2.0f * collisionScale), downButton.height * (1.0f + 2.0f * collisionScale) };
+
+            upButtonPressed = CheckCollisionPointRec(touchPos, upButtonExpanded);
+            downButtonPressed = CheckCollisionPointRec(touchPos, downButtonExpanded);
             
             if (upButtonPressed) {
                 player.y -= player.speed * GetFrameTime();
@@ -237,6 +216,8 @@ void Game::HandleInput()
 
 void Game::UpdateUI()
 {
+    bool shouldTogglePause = false;  // Track if we should toggle pause state
+
 #ifndef EMSCRIPTEN_BUILD
     if (WindowShouldClose() || (IsKeyPressed(KEY_ESCAPE) && exitWindowRequested == false))
     {
@@ -246,102 +227,85 @@ void Game::UpdateUI()
     }
 #endif
 
-#ifdef AM_RAY_DEBUG
-    if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
-    {
-        if (fullscreen)
-        {
-            fullscreen = false;
-            ToggleBorderlessWindowed();
-            SetWindowPosition(minimizeOffset, minimizeOffset);
-        }
-        else
-        {
-            fullscreen = true;
-            ToggleBorderlessWindowed();
-        }
-    }
-#endif
-
-    if (firstTimeGameStart) {
-        if (isMobile) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                firstTimeGameStart = false;
-            }
-        } else if (IsKeyPressed(KEY_ENTER)) {
+    // Handle mobile touch input for various game states
+    if (isMobile && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 touchPos = GetMousePosition();
+        touchPos.x = (touchPos.x - (GetScreenWidth() - gameScreenWidth * screenScale) * 0.5f) / screenScale;
+        touchPos.y = (touchPos.y - (GetScreenHeight() - gameScreenHeight * screenScale) * 0.5f) / screenScale;
+        
+        if (firstTimeGameStart) {
             firstTimeGameStart = false;
         }
-        return;
-    }
-
-    if (IsKeyPressed(KEY_ENTER))
-    {
-        if (gameOver && IsKeyPressed(KEY_ENTER))
-        {
+        else if (gameOver) {
             Reset();
         }
-        else if (levelComplete)
-        {
+        else if (levelComplete) {
             NextLevel();
         }
-        else if (playerScored || oponentScored)
-        {
+        else if (playerScored || oponentScored) {
             playerScored = false;
             oponentScored = false;
             ResetObjects();
         }
+        else if (!CheckCollisionPointRec(touchPos, upButtonExpanded) && !CheckCollisionPointRec(touchPos, downButtonExpanded)) {
+            // Flag that we should toggle pause
+            shouldTogglePause = true;
+        }
         return;
     }
 
-    if (exitWindowRequested)
-    {
-        if (IsKeyPressed(KEY_Y))
-        {
-            exitWindow = true;
-        }
-        else if (IsKeyPressed(KEY_N) || IsKeyPressed(KEY_ESCAPE))
-        {
-            exitWindowRequested = false;
-            isInExitMenu = false;
-        }
-    }
-
-    if (IsWindowFocused() == false)
-    {
-        lostWindowFocus = true;
-    }
-    else
-    {
-        lostWindowFocus = false;
-    }
-
-#ifndef EMSCRIPTEN_BUILD
-    if (exitWindowRequested == false && lostWindowFocus == false && gameOver == false && isFirstFrameAfterReset == false && IsKeyPressed(KEY_P))
-    {
-        paused = !paused;
-    }
-#else
-    if (exitWindowRequested == false && lostWindowFocus == false && gameOver == false && isFirstFrameAfterReset == false)
-    {
-        if (isMobile) {
-            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-                Vector2 touchPos = GetMousePosition();
-                touchPos.x = (touchPos.x - (GetScreenWidth() - gameScreenWidth * screenScale) * 0.5f) / screenScale;
-                touchPos.y = (touchPos.y - (GetScreenHeight() - gameScreenHeight * screenScale) * 0.5f) / screenScale;
-                
-                if (!CheckCollisionPointRec(touchPos, upButton) && !CheckCollisionPointRec(touchPos, downButton)) {
-                    paused = !paused;
-                }
+    // Handle keyboard input for non-mobile
+    if (!isMobile) {
+        if (IsKeyPressed(KEY_ENTER)) {
+            if (firstTimeGameStart) {
+                firstTimeGameStart = false;
             }
-        } else if (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_ESCAPE)) {
-            paused = !paused;
+            else if (gameOver) {
+                Reset();
+            }
+            else if (levelComplete) {
+                NextLevel();
+            }
+            else if (playerScored || oponentScored) {
+                playerScored = false;
+                oponentScored = false;
+                ResetObjects();
+            }
+            return;
         }
-    }
-#endif
 
-    // Handle game over restart for mobile
-    if (gameOver && isMobile && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-        Reset();
+        if (exitWindowRequested) {
+            if (IsKeyPressed(KEY_Y)) {
+                exitWindow = true;
+            }
+            else if (IsKeyPressed(KEY_N) || IsKeyPressed(KEY_ESCAPE)) {
+                exitWindowRequested = false;
+                isInExitMenu = false;
+            }
+        }
+
+        if (IsWindowFocused() == false) {
+            lostWindowFocus = true;
+        }
+        else {
+            lostWindowFocus = false;
+        }
+
+        // Check for keyboard pause input
+#ifndef EMSCRIPTEN_BUILD
+        if (!firstTimeGameStart && !gameOver && !levelComplete && !playerScored && !oponentScored && IsKeyPressed(KEY_P)) {
+            shouldTogglePause = true;
+        }
+#else
+        // Handle pause input for web builds (non mobile)
+        if (!firstTimeGameStart && !gameOver && !levelComplete && !playerScored && !oponentScored && (IsKeyPressed(KEY_P) || IsKeyPressed(KEY_ESCAPE))) {
+            shouldTogglePause = true;
+        }
+#endif
+    }
+
+    if (shouldTogglePause && !firstTimeGameStart && !gameOver && !levelComplete && !playerScored && !oponentScored) {
+        paused = !paused;
     }
 }
 
@@ -364,9 +328,12 @@ void Game::Draw()
 
     // Draw mobile controls if on mobile
     if (isMobile) {
-        // Calculate button centers
-        Vector2 upButtonCenter = { upButton.x + buttonSize/2, upButton.y + buttonSize/2 };
-        Vector2 downButtonCenter = { downButton.x + buttonSize/2, downButton.y + buttonSize/2 };
+        // Position buttons at bottom relative to the center of the screen;
+        upButton = { 0.0f + buttonSpacingX, (float)(gameScreenHeight - buttonSize - buttonSpacingY), (float)buttonSize, (float)buttonSize };
+        downButton = { (float)gameScreenWidth - buttonSize - buttonSpacingX, (float)(gameScreenHeight - buttonSize - buttonSpacingY), (float)buttonSize, (float)buttonSize };
+        
+        Vector2 upButtonCenter = { upButton.x + upButton.width/2, upButton.y + upButton.height/2 };
+        Vector2 downButtonCenter = { downButton.x + downButton.width/2, downButton.y + downButton.height/2 };
         
         // Draw up button
         if (upButtonPressed) {
@@ -480,17 +447,29 @@ void Game::DrawUI()
     else if (levelComplete)
     {
         DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Level complete! Press ENTER for next level", gameScreenWidth / 2 - 450, gameScreenHeight / 2, 40, yellow);
+        if (isMobile) {
+            DrawText("Level complete! Tap to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
+        } else {
+            DrawText("Level complete! Press ENTER for next level", gameScreenWidth / 2 - 450, gameScreenHeight / 2, 40, yellow);
+        }
     }
     else if (oponentScored)
     {
         DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Oponent scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
+        if (isMobile) {
+            DrawText("Oponent scores! Tap to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
+        } else {
+            DrawText("Oponent scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
+        }
     }
     else if (playerScored)
     {
         DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 40), 1000, 120}, 0.76f, 20, BLACK);
-        DrawText("Player scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
+        if (isMobile) {
+            DrawText("Player scores! Tap to continue", gameScreenWidth / 2 - 400, gameScreenHeight / 2, 40, yellow);
+        } else {
+            DrawText("Player scores! Press ENTER", gameScreenWidth / 2 - 300, gameScreenHeight / 2, 40, yellow);
+        }
     }
 }
 
