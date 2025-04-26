@@ -195,7 +195,7 @@ void Game::HandleInput()
 
     if (isMobile) {
         // Handle mobile touch input
-        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && paused == false) {
             Vector2 touchPos = GetMousePosition();
             
             // Adjust touch position for screen scaling
@@ -265,8 +265,11 @@ void Game::UpdateUI()
             ResetObjects();
         }
         else if (!CheckCollisionPointRec(touchPos, upButtonExpanded) && !CheckCollisionPointRec(touchPos, downButtonExpanded)) {
-            // Flag that we should toggle pause
+            // 
             shouldTogglePause = true;
+        }
+        else if(paused) {
+            paused = false;
         }
     }
 
@@ -410,7 +413,7 @@ void Game::DrawUI()
             DrawText("Welcome to Pong!", gameScreenWidth / 2 - 200, gameScreenHeight / 2 - 150, 50, yellow);
             DrawText("Controls:", gameScreenWidth / 2 - 100, gameScreenHeight / 2 - 80, 40, WHITE);
             DrawText("Use the up/down buttons at the bottom", gameScreenWidth / 2 - 400, gameScreenHeight / 2 - 20, 30, WHITE);
-            DrawText("Tap the screen to pause", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 20, 30, WHITE);
+            DrawText("Tap the top half of the screen to pause", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 20, 30, WHITE);
             DrawText("Tap to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 100, 40, yellow);
         } else {
             DrawText("Welcome to Pong!", gameScreenWidth / 2 - 200, gameScreenHeight / 2 - 150, 50, yellow);
