@@ -19,7 +19,10 @@ void Ball::Init()
     radius = cRadius;
     x = gameScreenWidth / 2;
     y = gameScreenHeight / 2;
-    velocity = { (float)ballSpeeds[0], (float)ballSpeeds[0] };
+    velocity = { 0.0f, 0.0f };  // Start with zero velocity
+    maxVelocity = { (float)ballSpeeds[0], (float)ballSpeeds[0] };
+    accelerationTime = 2.0f;  // 1 second to reach max velocity
+    currentAccelTime = 0.0f;
     color = ballColor;
 }
 
@@ -30,6 +33,23 @@ void Ball::Draw()
 
 void Ball::Update(float dt)
 {
+    // Handle acceleration
+    if (currentAccelTime < accelerationTime)
+    {
+        currentAccelTime += dt;
+        float progress = currentAccelTime / accelerationTime;
+        progress = Clamp(progress, 0.0f, 1.0f);
+        
+        // Linearly interpolate from 0 to max velocity
+        velocity.x = maxVelocity.x * progress;
+        velocity.y = maxVelocity.y * progress;
+    }
+    else
+    {
+        // Once acceleration is complete, maintain max velocity
+        velocity = maxVelocity;
+    }
+
     x += velocity.x * dt;
     y += velocity.y * dt;
 
@@ -50,18 +70,22 @@ void Ball::ResetBall()
 {
     x = gameScreenWidth / 2;
     y = gameScreenHeight / 2;
+    currentAccelTime = 0.0f;  // Reset acceleration timer
 
     // Set random initial direction while maintaining speed
-    float speed = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y);
+    float speed = sqrtf(maxVelocity.x * maxVelocity.x + maxVelocity.y * maxVelocity.y);
     float angle = (45.0f + 90.0f * GetRandomValue(0, 3)) * DEG2RAD;
-    velocity.x = cosf(angle) * speed;
-    velocity.y = sinf(angle) * speed;
+    maxVelocity.x = cosf(angle) * speed;
+    maxVelocity.y = sinf(angle) * speed;
+    velocity = { 0.0f, 0.0f };  // Start accelerating from zero
 }
 
 void Ball::SetSpeed(int spdX, int spdY)
 {
-    velocity.x = (float)spdX;
-    velocity.y = (float)spdY;
+    maxVelocity.x = (float)spdX;
+    maxVelocity.y = (float)spdY;
+    currentAccelTime = 0.0f;  // Reset acceleration timer
+    velocity = { 0.0f, 0.0f };  // Start accelerating from zero
 }
 
 void Ball::SetPosition(int posX, int posY)
@@ -72,12 +96,12 @@ void Ball::SetPosition(int posX, int posY)
 
 void Ball::AddBounceSpeed(int bounce)
 {
-    // Increase speed while maintaining direction
-    float speed = sqrtf(velocity.x * velocity.x + velocity.y * velocity.y);
-    float direction = atan2f(velocity.y, velocity.x);
+    // Increase max speed while maintaining direction
+    float speed = sqrtf(maxVelocity.x * maxVelocity.x + maxVelocity.y * maxVelocity.y);
+    float direction = atan2f(maxVelocity.y, maxVelocity.x);
     speed += bounce;
-    velocity.x = cosf(direction) * speed;
-    velocity.y = sinf(direction) * speed;
+    maxVelocity.x = cosf(direction) * speed;
+    maxVelocity.y = sinf(direction) * speed;
 }
 
 void Ball::Reflect(const Vector2& normal)
@@ -86,4 +110,9 @@ void Ball::Reflect(const Vector2& normal)
     float dotProduct = velocity.x * normal.x + velocity.y * normal.y;
     velocity.x = velocity.x - 2 * dotProduct * normal.x;
     velocity.y = velocity.y - 2 * dotProduct * normal.y;
+    
+    // Also reflect the max velocity to maintain direction
+    dotProduct = maxVelocity.x * normal.x + maxVelocity.y * normal.y;
+    maxVelocity.x = maxVelocity.x - 2 * dotProduct * normal.x;
+    maxVelocity.y = maxVelocity.y - 2 * dotProduct * normal.y;
 }

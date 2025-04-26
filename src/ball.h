@@ -17,7 +17,10 @@ public:
     void Reflect(const Vector2& normal);
 
     float x, y;
-    Vector2 velocity;  // Using Vector2 for velocity instead of separate x and y components
+    Vector2 velocity;      // Current velocity
+    Vector2 maxVelocity;   // Target velocity
+    float accelerationTime; // Time to reach max velocity
+    float currentAccelTime; // Current time spent accelerating
     int radius;
     Color color;
     const int cRadius = 20;
