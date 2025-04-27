@@ -440,8 +440,9 @@ void Game::DrawUI()
 #endif
 #ifndef EMSCRIPTEN_BUILD
             DrawText("ESC: Exit game", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 60, 30, WHITE);
+            DrawText("ALT+ENTER: Toggle fullscreen", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 100, 30, WHITE);
 #endif
-            DrawText("Press ENTER to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 100, 40, yellow);
+            DrawText("Press ENTER to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 140, 40, yellow);
         }
     }
     else if (paused)
