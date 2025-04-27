@@ -25,6 +25,9 @@ void gameLoop() {
 int main()
 {
     InitWindow(gameScreenWidth, gameScreenHeight, "Pong");
+#ifndef EMSCRIPTEN_BUILD
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
+#endif
     InitAudioDevice();
     SetMasterVolume(0.22f);
     SetExitKey(KEY_NULL);
@@ -41,7 +44,10 @@ int main()
     emscripten_set_main_loop(gameLoop, 0, 1);
 #else
     // Regular desktop game loop
-    ToggleBorderlessWindowed();
+    if(fullscreen) 
+    { 
+        ToggleBorderlessWindowed(); 
+    }
     while (!exitWindow)
     {
         gameLoop();

@@ -242,6 +242,20 @@ void Game::UpdateUI()
         isInExitMenu = true;
         return;
     }
+
+    if (IsKeyPressed(KEY_ENTER) && (IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT)))
+    {
+        if (fullscreen)
+        {
+            fullscreen = false;
+            ToggleBorderlessWindowed();
+        }
+        else
+        {
+            fullscreen = true;
+            ToggleBorderlessWindowed();
+        }
+    }    
 #endif
 
     // Handle mobile touch input for various game states
