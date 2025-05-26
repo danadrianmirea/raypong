@@ -14,6 +14,8 @@ Game::Game()
     firstTimeGameStart = true;
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
     sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
+    backgroundMusic = LoadMusicStream("res/music.mp3");
+    SetMusicVolume(backgroundMusic, 0.5f);  // Set volume to 50%
     targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
     SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
@@ -37,6 +39,7 @@ Game::~Game()
     UnloadFont(font);
     UnloadSound(sndBallBounce);
     UnloadSound(sndBallBounceWall);
+    UnloadMusicStream(backgroundMusic);
     delete instance;
     instance = 0;
 }
@@ -98,6 +101,7 @@ void Game::Update(float dt)
         return;
     }
 
+    UpdateMusicStream(backgroundMusic);  // Update music stream
     screenScale = MIN((float)GetScreenWidth() / gameScreenWidth, (float)GetScreenHeight() / gameScreenHeight);
     UpdateUI();
 
@@ -268,6 +272,7 @@ void Game::UpdateUI()
         
         if (firstTimeGameStart) {
             firstTimeGameStart = false;
+            PlayMusicStream(backgroundMusic);  // Start playing music after welcome screen
         }
         else if (gameOver) {
             Reset();
@@ -294,6 +299,7 @@ void Game::UpdateUI()
         if (IsKeyPressed(KEY_ENTER)) {
             if (firstTimeGameStart) {
                 firstTimeGameStart = false;
+                PlayMusicStream(backgroundMusic);  // Start playing music after welcome screen
             }
             else if (gameOver) {
                 Reset();

@@ -80,6 +80,7 @@ public:
     int numBounces;
     Sound sndBallBounce;
     Sound sndBallBounceWall;
+    Music backgroundMusic;
 
 private:
     Ball ball;
