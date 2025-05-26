@@ -2,6 +2,8 @@
 
 A modern implementation of the classic Pong game built with [raylib](https://www.raylib.com/).
 
+Play on itch.io: https://adrianmirea.itch.io/
+
 ## Features
 
 - Classic Pong gameplay with smooth controls
