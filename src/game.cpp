@@ -428,7 +428,7 @@ void Game::DrawUI()
 {
     // Draw semi-transparent background for all UI elements
     Color uiBgColor = BLACK;
-    uiBgColor.a = 128;  // Semi-transparent black
+    uiBgColor.a = 64;  // Semi-transparent black
     
     // Single background rectangle covering all UI elements
     DrawRectangleRounded({(float)(gameScreenWidth / 4 - 60), 60, (float)(gameScreenWidth / 2 + 120), 100}, 0.2f, 10, uiBgColor);
