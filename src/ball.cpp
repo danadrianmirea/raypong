@@ -58,13 +58,13 @@ void Ball::Update(float dt)
     {
         Reflect({ 0, -1 }); // Reflect off bottom wall
         y = gameScreenHeight - cRadius; // Prevent sticking to wall
-        PlaySound(Game::GetInstance()->sndBallBounce);
+        PlaySound(Game::GetInstance()->sndBallBounceWall);
     }
     else if (y <= cRadius)
     {
         Reflect({ 0, 1 }); // Reflect off top wall
         y = cRadius; // Prevent sticking to wall
-        PlaySound(Game::GetInstance()->sndBallBounce);
+        PlaySound(Game::GetInstance()->sndBallBounceWall);
     }
 }
 

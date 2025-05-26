@@ -79,6 +79,7 @@ public:
     int level;
     int numBounces;
     Sound sndBallBounce;
+    Sound sndBallBounceWall;
 
 private:
     Ball ball;

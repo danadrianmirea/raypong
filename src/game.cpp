@@ -13,6 +13,7 @@ Game::Game()
 {
     firstTimeGameStart = true;
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
+    sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
     targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
     SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
@@ -35,6 +36,7 @@ Game::~Game()
     UnloadRenderTexture(targetRenderTex);
     UnloadFont(font);
     UnloadSound(sndBallBounce);
+    UnloadSound(sndBallBounceWall);
     delete instance;
     instance = 0;
 }
@@ -348,12 +350,22 @@ void Game::Draw()
     BeginTextureMode(targetRenderTex);
     ClearBackground(boardColor);
 
+    int lineThickness = 6;
+    // Border
+    //DrawRectangleLinesEx((Rectangle){0, 0, gameScreenWidth, gameScreenHeight}, lineThickness, WHITE);
+    // Vertical center line
+    //DrawRectangle(gameScreenWidth / 2 - lineThickness / 2, 0, lineThickness, gameScreenHeight, WHITE);
+    // Horizontal center line
+    //DrawRectangle(0, gameScreenHeight / 2 - lineThickness / 2, gameScreenWidth, lineThickness, WHITE);
+/*
     Color centerLineColor = markingColor;
     centerLineColor.a = 90;
     DrawLine(gameScreenWidth / 2, 0, gameScreenWidth / 2, gameScreenHeight, centerLineColor);
     Color centerColor = markingColor;
     centerColor.a = 100;
     DrawCircle(gameScreenWidth / 2, gameScreenHeight / 2, 100, centerColor);
+*/
+
     ball.Draw();
     player.Draw();
     oponent.Draw();
