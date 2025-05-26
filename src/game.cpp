@@ -12,11 +12,12 @@ static float Clamp(float value, float min, float max)
 Game::Game()
 {
     firstTimeGameStart = true;
-    musicMuted = false;  // Initialize music as not muted
+    musicMuted = false;
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
     sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
+    sndScore = LoadSound("res/score.mp3");
     backgroundMusic = LoadMusicStream("res/music.mp3");
-    SetMusicVolume(backgroundMusic, 0.5f);  // Set volume to 50%
+    SetMusicVolume(backgroundMusic, 0.5f);
     targetRenderTex = LoadRenderTexture(gameScreenWidth, gameScreenHeight);
     SetTextureFilter(targetRenderTex.texture, TEXTURE_FILTER_BILINEAR);
     font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
@@ -40,6 +41,7 @@ Game::~Game()
     UnloadFont(font);
     UnloadSound(sndBallBounce);
     UnloadSound(sndBallBounceWall);
+    UnloadSound(sndScore);  // Unload score sound
     UnloadMusicStream(backgroundMusic);
     delete instance;
     instance = 0;
@@ -164,12 +166,14 @@ void Game::Update(float dt)
         {
             oponent_score++;
             oponentScored = true;
+            PlaySound(sndScore);  // Play score sound when opponent scores
         }
 
         if (ball.x < ball.cRadius)
         {
             player_score++;
             playerScored = true;
+            PlaySound(sndScore);  // Play score sound when player scores
         }
 
         if (oponent_score >= 5)

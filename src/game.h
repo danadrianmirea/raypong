@@ -80,6 +80,7 @@ public:
     int numBounces;
     Sound sndBallBounce;
     Sound sndBallBounceWall;
+    Sound sndScore;  // Add score sound effect
     Music backgroundMusic;
     bool musicMuted;  // Add flag for music mute state
 
