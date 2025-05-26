@@ -266,7 +266,7 @@ void Game::UpdateUI()
 #endif
 
     // Add music toggle with M key
-    if (IsKeyPressed(KEY_M)) {
+    if (!firstTimeGameStart && IsKeyPressed(KEY_M)) {
         musicMuted = !musicMuted;
         if (musicMuted) {
             PauseMusicStream(backgroundMusic);
