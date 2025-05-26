@@ -426,9 +426,15 @@ void Game::Draw()
 
 void Game::DrawUI()
 {
+    // Draw semi-transparent background for all UI elements
+    Color uiBgColor = BLACK;
+    uiBgColor.a = 128;  // Semi-transparent black
+    
+    // Single background rectangle covering all UI elements
+    DrawRectangleRounded({(float)(gameScreenWidth / 4 - 60), 60, (float)(gameScreenWidth / 2 + 120), 100}, 0.2f, 10, uiBgColor);
+
     DrawText(TextFormat("%i", oponent_score), gameScreenWidth / 4 - 20, 80, 80, oponent.color);
     DrawText(TextFormat("%i", player_score), 3 * gameScreenWidth / 4 - 20, 80, 80, player.color);
-
     DrawText(TextFormat("Level: %i", level), gameScreenWidth / 2 - 140, 80, 80, WHITE);
 
     if (exitWindowRequested)
