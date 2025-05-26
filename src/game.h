@@ -81,6 +81,7 @@ public:
     Sound sndBallBounce;
     Sound sndBallBounceWall;
     Music backgroundMusic;
+    bool musicMuted;  // Add flag for music mute state
 
 private:
     Ball ball;

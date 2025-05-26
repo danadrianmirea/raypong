@@ -12,6 +12,7 @@ static float Clamp(float value, float min, float max)
 Game::Game()
 {
     firstTimeGameStart = true;
+    musicMuted = false;  // Initialize music as not muted
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
     sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
     backgroundMusic = LoadMusicStream("res/music.mp3");
@@ -263,6 +264,16 @@ void Game::UpdateUI()
         }
     }    
 #endif
+
+    // Add music toggle with M key
+    if (IsKeyPressed(KEY_M)) {
+        musicMuted = !musicMuted;
+        if (musicMuted) {
+            PauseMusicStream(backgroundMusic);
+        } else {
+            ResumeMusicStream(backgroundMusic);
+        }
+    }
 
     // Handle mobile touch input for various game states
     if (isMobile && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
