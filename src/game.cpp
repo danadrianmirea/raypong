@@ -455,9 +455,11 @@ void Game::DrawUI()
     DrawText(TextFormat("Level: %i", level), gameScreenWidth / 2 - 140, 80, 80, WHITE);
 
     // Draw music toggle status at the bottom of the screen
-    const char* musicStatus = musicMuted ? "Press M to toggle music (OFF)" : "Press M to toggle music (ON)";
-    int textWidth = MeasureText(musicStatus, 32);
-    DrawText(musicStatus, gameScreenWidth / 2 - textWidth / 2, gameScreenHeight - 40, 32, WHITE);
+    if(!isMobile) {
+        const char* musicStatus = musicMuted ? "Press M to toggle music (OFF)" : "Press M to toggle music (ON)";
+        int textWidth = MeasureText(musicStatus, 32);
+        DrawText(musicStatus, gameScreenWidth / 2 - textWidth / 2, gameScreenHeight - 40, 32, WHITE);
+    }
 
     if (exitWindowRequested)
     {
