@@ -350,21 +350,26 @@ void Game::Draw()
     BeginTextureMode(targetRenderTex);
     ClearBackground(boardColor);
 
-    int lineThickness = 6;
-    // Border
-    //DrawRectangleLinesEx((Rectangle){0, 0, gameScreenWidth, gameScreenHeight}, lineThickness, WHITE);
-    // Vertical center line
-    //DrawRectangle(gameScreenWidth / 2 - lineThickness / 2, 0, lineThickness, gameScreenHeight, WHITE);
-    // Horizontal center line
-    //DrawRectangle(0, gameScreenHeight / 2 - lineThickness / 2, gameScreenWidth, lineThickness, WHITE);
-/*
-    Color centerLineColor = markingColor;
-    centerLineColor.a = 90;
-    DrawLine(gameScreenWidth / 2, 0, gameScreenWidth / 2, gameScreenHeight, centerLineColor);
+    //Color centerLineColor = markingColor;
+    //centerLineColor.a = 90;
+    //DrawLine(gameScreenWidth / 2, 0, gameScreenWidth / 2, gameScreenHeight, centerLineColor);
     Color centerColor = markingColor;
     centerColor.a = 100;
     DrawCircle(gameScreenWidth / 2, gameScreenHeight / 2, 100, centerColor);
-*/
+
+
+    int lineThickness = 6;
+    // Border
+    Color lineColor = BLACK;
+    lineColor.a = 128;
+    float padding = 1;
+    DrawRectangleLinesEx((Rectangle){padding, padding, gameScreenWidth - padding * 2, gameScreenHeight - padding * 2}, lineThickness, lineColor);
+    // Vertical center line
+    DrawRectangle(gameScreenWidth / 2 - lineThickness / 2, padding, lineThickness, gameScreenHeight - padding * 2, lineColor);
+    // Horizontal center line
+    DrawRectangle(padding, gameScreenHeight / 2 - lineThickness / 2, gameScreenWidth - padding * 2, lineThickness, lineColor);
+
+
 
     ball.Draw();
     player.Draw();
