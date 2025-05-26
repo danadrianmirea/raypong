@@ -468,7 +468,7 @@ void Game::DrawUI()
     }
     else if (firstTimeGameStart)
     {
-        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 200), 1000, 400}, 0.76f, 20, BLACK);
+        DrawRectangleRounded({(float)(gameScreenWidth / 2 - 500), (float)(gameScreenHeight / 2 - 200), 1000, 450}, 0.76f, 20, BLACK);
         
         if (isMobile) {
             DrawText("Welcome to Pong!", gameScreenWidth / 2 - 200, gameScreenHeight / 2 - 150, 50, yellow);
@@ -489,7 +489,12 @@ void Game::DrawUI()
             DrawText("ESC: Exit game", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 60, 30, WHITE);
             DrawText("ALT+ENTER: Toggle fullscreen", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 100, 30, WHITE);
 #endif
-            DrawText("Press ENTER to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 140, 40, yellow);
+#ifdef EMSCRIPTEN_BUILD
+            DrawText("M: Toggle music", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 60, 30, WHITE);
+#else
+            DrawText("M: Toggle music", gameScreenWidth / 2 - 400, gameScreenHeight / 2 + 140, 30, WHITE);
+#endif
+            DrawText("Press ENTER to start", gameScreenWidth / 2 - 200, gameScreenHeight / 2 + 180, 40, yellow);
         }
     }
     else if (paused)
