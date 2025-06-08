@@ -31,7 +31,7 @@ set(HEADERS
 )
 
 # Create executable with explicit target name
-set(TARGET_NAME "RayPong")
+set(TARGET_NAME ${PROJECT_NAME})
 add_executable(${TARGET_NAME} ${SOURCES} ${HEADERS})
 
 # Add raylib as a subdirectory
