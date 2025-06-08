@@ -27,6 +27,7 @@ int main()
     InitWindow(gameScreenWidth, gameScreenHeight, "Pong");
 #ifndef EMSCRIPTEN_BUILD
     SetWindowState(FLAG_WINDOW_RESIZABLE);
+    ToggleBorderlessWindowed();
 #endif
     InitAudioDevice();
     SetMasterVolume(0.22f);
