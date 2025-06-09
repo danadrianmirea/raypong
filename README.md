@@ -1,4 +1,4 @@
-# RayPong
+# Pong
 
 A modern implementation of the classic Pong game built with [raylib](https://www.raylib.com/).
 
