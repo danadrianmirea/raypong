@@ -29,6 +29,7 @@ public:
     float decisionTimer;
     bool isMakingMistake;
     float mistakeTimer;
+    float lastMistakeTime;
 
     // Movement smoothing
     float currentVelocity;

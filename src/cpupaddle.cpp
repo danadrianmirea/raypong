@@ -20,15 +20,15 @@ void CPUPaddle::Init()
     width = 25;
     height = 120;
     x = 10;
-    speed = 1200;  // Increased from 1000
+    speed = 1300;  // Reduced from 1400
     y = gameScreenHeight / 2 - height / 2;
     color = Color{255, 41, 55, 255};
     
-    // Initialize AI parameters with higher base values (previous level 4 values)
-    predictionAccuracy = 0.92f;    // Previous level 4 value
-    reactionSpeed = 0.92f;         // Previous level 4 value
-    mistakeChance = 0.06f;         // Previous level 4 value
-    personalityAggressiveness = 0.92f; // Previous level 4 value
+    // Initialize AI parameters with balanced base values
+    predictionAccuracy = 0.93f;    // Reduced from 0.95f
+    reactionSpeed = 0.93f;         // Reduced from 0.95f
+    mistakeChance = 0.08f;         // Increased from 0.04f
+    personalityAggressiveness = 0.93f; // Reduced from 0.95f
     
     // Initialize state
     targetY = y;
@@ -39,11 +39,12 @@ void CPUPaddle::Init()
     decisionTimer = 0;
     isMakingMistake = false;
     mistakeTimer = 0;
+    lastMistakeTime = 0;
     
     // Movement smoothing
     currentVelocity = 0;
     targetVelocity = 0;
-    smoothingFactor = 0.2f;  // Increased from 0.15f for faster response
+    smoothingFactor = 0.22f;  // Reduced from 0.25f
 }
 
 void CPUPaddle::Update(float dt, float ball_y, float ball_x, float ball_velocity_x, float ball_velocity_y)
@@ -51,63 +52,72 @@ void CPUPaddle::Update(float dt, float ball_y, float ball_x, float ball_velocity
     Game* game = Game::GetInstance();
     int level = game->level;
     
-    // Update AI parameters with more aggressive scaling
-    // Level 1: 92% accuracy -> Level 6: 99.5% accuracy
-    predictionAccuracy = 0.92f + (level - 1) * 0.015f;
+    // Update AI parameters with more gradual scaling
+    // Level 1: 93% accuracy -> Level 6: 98% accuracy
+    predictionAccuracy = 0.93f + (level - 1) * 0.01f;
     
-    // Level 1: 92% reaction -> Level 6: 99.5% reaction
-    reactionSpeed = 0.92f + (level - 1) * 0.015f;
+    // Level 1: 93% reaction -> Level 6: 98% reaction
+    reactionSpeed = 0.93f + (level - 1) * 0.01f;
     
-    // Level 1: 6% mistakes -> Level 6: 0.5% mistakes
-    mistakeChance = 0.06f - (level - 1) * 0.011f;
+    // Level 1: 8% mistakes -> Level 6: 3% mistakes
+    mistakeChance = 0.08f - (level - 1) * 0.01f;
     
-    // Level 1: 92% aggressive -> Level 6: 99.5% aggressive
-    personalityAggressiveness = 0.92f + (level - 1) * 0.015f;
+    // Level 1: 93% aggressive -> Level 6: 98% aggressive
+    personalityAggressiveness = 0.93f + (level - 1) * 0.01f;
     
-    // Update decision timer with level-based reaction speed
+    // Update decision timer with balanced reaction speed
     decisionTimer += dt;
-    float decisionInterval = 0.08f / reactionSpeed;  // Reduced from 0.1f for faster decisions
+    float decisionInterval = 0.07f / reactionSpeed;  // Increased from 0.06f
     
     if (decisionTimer >= decisionInterval) {
         decisionTimer = 0;
         
         float centerY = gameScreenHeight / 2 - height / 2;
         
-        // Calculate ball's predicted position with improved accuracy at higher levels
+        // Calculate ball's predicted position with balanced accuracy
         float timeToReachPaddle = (x - ball_x) / ball_velocity_x;
         float predictedY = ball_y + (ball_velocity_y * timeToReachPaddle);
         
-        // Add prediction error based on accuracy (reduced error range at higher levels)
-        float error = (1.0f - predictionAccuracy) * 40.0f; // Reduced from 50.0f
+        // Add balanced prediction error
+        float error = (1.0f - predictionAccuracy) * 30.0f; // Increased from 25.0f
         predictedY += GetRandomValue(-error, error);
         
         // Calculate distance to center
         float distanceToCenter = predictedY - centerY;
         
-        // Apply a bias towards center position (reduced at higher levels)
-        float centerBias = -distanceToCenter * (0.1f - (level - 1) * 0.015f); // Reduced from 0.15f
+        // Balanced center bias
+        float centerBias = -distanceToCenter * (0.13f - (level - 1) * 0.015f);
         
-        // Add strategic positioning based on ball's vertical velocity
+        // Balanced strategic positioning
         float strategicOffset = 0;
         if (abs(ball_velocity_y) > 100.0f) {
-            // Move more aggressively at higher levels
-            strategicOffset = ball_velocity_y * (0.1f + (level - 1) * 0.02f) * personalityAggressiveness; // Increased multipliers
-            strategicOffset = Clamp(strategicOffset, -60.0f, 60.0f); // Increased from 50.0f
+            // Balanced strategic movement
+            float velocityFactor = Clamp(ball_velocity_y / 450.0f, -1.0f, 1.0f); // Increased from 400.0f
+            strategicOffset = velocityFactor * 55.0f * personalityAggressiveness; // Reduced from 60.0f
+            strategicOffset = Clamp(strategicOffset, -55.0f, 55.0f); // Reduced from 60.0f
         }
         
-        // Calculate final position with center bias and strategic offset
+        // Calculate final position with balanced constraints
         float finalY = predictedY + centerBias + strategicOffset;
         
-        // Ensure the final position isn't too far from center (increased range at higher levels)
-        float maxOffsetFromCenter = 250.0f + (level - 1) * 40.0f; // Increased from 200.0f + 30.0f
+        // Balanced position limits
+        float maxOffsetFromCenter = 220.0f + (level - 1) * 35.0f; // Reduced from 250.0f + 40.0f
         if (abs(finalY - centerY) > maxOffsetFromCenter) {
             finalY = centerY + (finalY > centerY ? maxOffsetFromCenter : -maxOffsetFromCenter);
         }
         
-        // Check for mistakes with reduced duration at higher levels
-        if (!isMakingMistake && GetRandomValue(0, 100) < mistakeChance * 100) {
-            isMakingMistake = true;
-            mistakeTimer = GetRandomValue(1, 2) * (0.04f - (level - 1) * 0.005f); // Reduced from 0.06f
+        // Improved mistake handling
+        lastMistakeTime += dt;
+        float minTimeBetweenMistakes = 2.0f - (level - 1) * 0.2f; // Minimum time between mistakes
+        
+        if (!isMakingMistake && lastMistakeTime >= minTimeBetweenMistakes) {
+            // Only make mistakes when the ball is far enough away
+            float distanceToBall = abs(ball_x - x);
+            if (distanceToBall > 300.0f && GetRandomValue(0, 100) < mistakeChance * 100) {
+                isMakingMistake = true;
+                mistakeTimer = 0.045f - (level - 1) * 0.005f;
+                lastMistakeTime = 0;
+            }
         }
         
         if (isMakingMistake) {
@@ -115,8 +125,9 @@ void CPUPaddle::Update(float dt, float ball_y, float ball_x, float ball_velocity
             if (mistakeTimer <= 0) {
                 isMakingMistake = false;
             } else {
-                // During mistake, move in wrong direction but still respect center bias
-                float mistakeOffset = GetRandomValue(-40, 40); // Reduced from 50
+                // Strategic mistake movement - move slightly off from optimal position
+                float optimalDirection = (predictedY > centerY) ? 1.0f : -1.0f;
+                float mistakeOffset = optimalDirection * -25.0f; // Move in opposite direction of optimal
                 finalY = centerY + mistakeOffset;
             }
         }
@@ -124,15 +135,14 @@ void CPUPaddle::Update(float dt, float ball_y, float ball_x, float ball_velocity
         // Update target position
         targetY = finalY - height / 2;
         
-        // Calculate target velocity based on distance to target (faster at higher levels)
+        // Balanced velocity calculation
         float distanceToTarget = targetY - y;
-        float speedMultiplier = 1.0f + (level - 1) * 0.2f; // Increased from 0.15f
-        targetVelocity = Clamp(distanceToTarget * 3.0f * speedMultiplier, -speed, speed); // Increased from 2.5f
+        float speedMultiplier = 1.0f + (level - 1) * 0.15f; // Reduced from 0.2f
+        targetVelocity = Clamp(distanceToTarget * 2.75f * speedMultiplier, -speed, speed); // Reduced from 3.0f
     }
     
-    // Smoothly interpolate current velocity towards target velocity
-    // Faster smoothing at higher levels
-    float currentSmoothingFactor = smoothingFactor * (1.0f + (level - 1) * 0.2f); // Increased from 0.15f
+    // Balanced movement smoothing
+    float currentSmoothingFactor = smoothingFactor * (1.0f + (level - 1) * 0.15f); // Reduced from 0.2f
     currentVelocity = currentVelocity + (targetVelocity - currentVelocity) * currentSmoothingFactor;
     
     // Apply velocity to position
@@ -159,6 +169,7 @@ void CPUPaddle::ResetPosition()
     targetY = y;
     isMakingMistake = false;
     mistakeTimer = 0;
+    lastMistakeTime = 0;
     currentVelocity = 0;
     targetVelocity = 0;
 }
