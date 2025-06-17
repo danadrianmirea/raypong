@@ -115,7 +115,7 @@ void Game::Update(float dt)
 
         ball.Update(dt);
         player.Update(dt);
-        oponent.Update(dt, ball.y);
+        oponent.Update(dt, ball.y, ball.x, ball.velocity.x, ball.velocity.y);
 
         // Check collisions
         if (CheckCollisionCircleRec(Vector2{ball.x, ball.y}, ball.radius, Rectangle{player.x, player.y, player.width, player.height}))
