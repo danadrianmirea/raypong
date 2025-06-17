@@ -104,4 +104,5 @@ private:
     int buttonSpacingY = 80;
     bool upButtonPressed;
     bool downButtonPressed;
+    float enterKeyDebounceTimer;  // Timer to prevent rapid Enter key presses
 };

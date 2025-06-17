@@ -13,6 +13,7 @@ Game::Game()
 {
     firstTimeGameStart = true;
     musicMuted = false;
+    enterKeyDebounceTimer = 0.0f;  // Initialize debounce timer
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
     sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
     sndScore = LoadSound("res/score.mp3");
@@ -246,6 +247,11 @@ void Game::UpdateUI()
 {
     bool shouldTogglePause = false;  // Track if we should toggle pause state
 
+    // Update debounce timer
+    if (enterKeyDebounceTimer > 0.0f) {
+        enterKeyDebounceTimer -= GetFrameTime();
+    }
+
 #ifndef EMSCRIPTEN_BUILD
     if (WindowShouldClose() || (IsKeyPressed(KEY_ESCAPE) && exitWindowRequested == false))
     {
@@ -311,7 +317,8 @@ void Game::UpdateUI()
 
     // Handle keyboard input for non-mobile
     if (!isMobile) {
-        if (IsKeyPressed(KEY_ENTER)) {
+        if (IsKeyPressed(KEY_ENTER) && enterKeyDebounceTimer <= 0.0f) {
+            enterKeyDebounceTimer = 0.5f;  // Set 500ms debounce time
             if (firstTimeGameStart) {
                 firstTimeGameStart = false;
                 PlayMusicStream(backgroundMusic);  // Start playing music after welcome screen
