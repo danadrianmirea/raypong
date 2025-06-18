@@ -56,14 +56,14 @@ void Game::InitGame()
     lostWindowFocus = false;
     gameOver = false;
 
-    level = 6;
+    level = 1;
 
     playerScored = false;
     oponentScored = false;
     playerWins = false;
     levelComplete = false;
 
-    player_score = 4;
+    player_score = 0;
     oponent_score = 0;
     numBounces = 0;
 
