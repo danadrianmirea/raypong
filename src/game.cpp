@@ -13,7 +13,7 @@ Game::Game()
 {
     firstTimeGameStart = true;
     musicMuted = false;
-    enterKeyDebounceTimer = 0.0f;  // Initialize debounce timer
+    enterKeyDebounceTimer = 0.0f;
     sndBallBounce = LoadSound("res/ball_bounce.mp3");
     sndBallBounceWall = LoadSound("res/ball_bounce.mp3");
     sndScore = LoadSound("res/score.mp3");
@@ -56,14 +56,14 @@ void Game::InitGame()
     lostWindowFocus = false;
     gameOver = false;
 
-    level = 1;
+    level = 6;
 
     playerScored = false;
     oponentScored = false;
     playerWins = false;
     levelComplete = false;
 
-    player_score = 0;
+    player_score = 4;
     oponent_score = 0;
     numBounces = 0;
 
@@ -247,8 +247,7 @@ void Game::UpdateUI()
 {
     bool shouldTogglePause = false;  // Track if we should toggle pause state
 
-    // Update debounce timer
-    if (enterKeyDebounceTimer > 0.0f) {
+    if (enterKeyDebounceTimer > 0.0f && (firstTimeGameStart || gameOver || levelComplete || playerScored || oponentScored)) {
         enterKeyDebounceTimer -= GetFrameTime();
     }
 
@@ -307,7 +306,6 @@ void Game::UpdateUI()
             ResetObjects();
         }
         else if (!CheckCollisionPointRec(touchPos, upButtonExpanded) && !CheckCollisionPointRec(touchPos, downButtonExpanded)) {
-            // 
             shouldTogglePause = true;
         }
         else if(paused) {
@@ -318,21 +316,30 @@ void Game::UpdateUI()
     // Handle keyboard input for non-mobile
     if (!isMobile) {
         if (IsKeyPressed(KEY_ENTER) && enterKeyDebounceTimer <= 0.0f) {
-            enterKeyDebounceTimer = 0.5f;  // Set 500ms debounce time
+
+            bool actionTaken = false;
+            
             if (firstTimeGameStart) {
                 firstTimeGameStart = false;
                 PlayMusicStream(backgroundMusic);  // Start playing music after welcome screen
+                actionTaken = true;
             }
             else if (gameOver) {
                 Reset();
+                actionTaken = true;
             }
             else if (levelComplete) {
                 NextLevel();
+                actionTaken = true;
             }
             else if (playerScored || oponentScored) {
                 playerScored = false;
                 oponentScored = false;
                 ResetObjects();
+                actionTaken = true;
+            }
+            if(actionTaken) {
+                enterKeyDebounceTimer = 0.5f;
             }
             return;
         }
